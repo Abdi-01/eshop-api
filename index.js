@@ -15,7 +15,7 @@ dbConf.getConnection((error,connection)=>{
         console.log("Error MySQL Connection", error.sqlMessage);
     }
 
-    console.log(`Connect ✅ : ${connection.threadId}`);
+    console.log(`Connect MySQL ✅ : ${connection.threadId}`);
 })
 // CONFIG ROUTERS
 const { authRouter } = require('./routers');
