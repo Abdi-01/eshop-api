@@ -1,4 +1,5 @@
 const { dbConf } = require('../config/db');
+const { hashPassword } = require('../config/encript');
 
 module.exports = {
     getData: (req, res) => {
@@ -8,7 +9,7 @@ module.exports = {
                     console.log('Error query SQL :', err);
                     res.status(500).send(err);
                 }
-                
+
                 console.log('Results SQL :', results);
                 res.status(200).send(results);
             })
@@ -17,8 +18,10 @@ module.exports = {
         console.log(req.body);
         let { username, email, age, city, password } = req.body;
         dbConf.query(`INSERT INTO USERS (username, email, age, city, password ) 
-        values ('${username}', '${email})', ${age}, '${city}', '${password}');`, (err, results) => {
-            if(err){
+        values (${dbConf.escape(username)}, ${dbConf.escape(email)}, 
+        ${dbConf.escape(age)}, ${dbConf.escape(city)}, 
+        ${dbConf.escape(hashPassword(password))});`, (err, results) => {
+            if (err) {
                 console.log('Error query SQL :', err);
                 res.status(500).send(err);
             }
