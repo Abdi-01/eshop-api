@@ -16,10 +16,9 @@ module.exports = {
     },
     register: (req, res) => {
         console.log(req.body);
-        let { username, email, age, city, password } = req.body;
-        dbConf.query(`INSERT INTO USERS (username, email, age, city, password ) 
-        values (${dbConf.escape(username)}, ${dbConf.escape(email)}, 
-        ${dbConf.escape(age)}, ${dbConf.escape(city)}, 
+        let { username, email, password } = req.body;
+        dbConf.query(`INSERT INTO USERS (username, email, password ) 
+        values (${dbConf.escape(username)}, ${dbConf.escape(email)},  
         ${dbConf.escape(hashPassword(password))});`, (err, results) => {
             if (err) {
                 console.log('Error query SQL :', err);
@@ -34,7 +33,7 @@ module.exports = {
     },
     login: (req, res) => {
         let { email, password } = req.body;
-        dbConf.query(`Select u.iduser, u.username, u.email, u.age, u.city, u.status_id, s.status from users u JOIN status s on u.status_id = s.idstatus 
+        dbConf.query(`Select u.iduser, u.username, u.email, u.age, u.city, u.role, u.status_id, s.status from users u JOIN status s on u.status_id = s.idstatus 
         WHERE u.email=${dbConf.escape(email)} 
         and u.password=${dbConf.escape(hashPassword(password))};`, (err, results) => {
             if (err) {
