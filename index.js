@@ -23,7 +23,8 @@ dbConf.getConnection((error,connection)=>{
     console.log(`Connect MySQL ✅ : ${connection.threadId}`);
 })
 // CONFIG ROUTERS
-const { authRouter } = require('./routers');
+const { authRouter, productRouter } = require('./routers');
 app.use('/auth', authRouter);
+app.use('/products', productRouter);
 
 app.listen(PORT, () => console.log(`Running ESHOP API at ${PORT}`));
