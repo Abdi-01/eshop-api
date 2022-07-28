@@ -60,7 +60,8 @@ module.exports = {
         })
     },
     keepLogin: (req, res) => {
-        dbConf.query(`Select u.iduser, u.username, u.email, u.age, u.city, u.role, u.status_id, s.status from users u JOIN status s on u.status_id = s.idstatus 
+        dbConf.query(`Select u.iduser, u.username, u.email, u.age, u.city, u.role, u.status_id, s.status from users u 
+        JOIN status s on u.status_id = s.idstatus 
         WHERE u.iduser=${dbConf.escape(req.query.id)};`, (err, results) => {
             if (err) {
                 console.log('Error query SQL :', err);
