@@ -1,5 +1,4 @@
-const { dbConf, dbQuery } = require("../config/db")
-
+const { dbConf, dbQuery } = require("../config/db");
 
 module.exports = {
     getData: async (req, res) => {
@@ -26,18 +25,28 @@ module.exports = {
             res.status(500).send(error);
         }
     },
-    add: async (req, res) => {
-        let dataInput = [];
-        for(const prop in req.body){
-            dataInput.push(dbConf.escape(req.body[prop]))
-        }
-        let addData = await dbQuery(`INSERT INTO products (name, brand, category, description, images, stock, price) 
-        values (${dataInput.join(',')});`);
+    add: async (req, res) => {     
+        try {
+            console.log(req.body);
+            console.log(req.files);
 
-        res.status(200).send({
-            success:true,
-            message:'Add product Success'
-        })
+            // Memproses data ke mysql
+            // let dataInput = [];
+            // for (const prop in req.body) {
+            //     dataInput.push(dbConf.escape(req.body[prop]))
+            // }
+            // let addData = await dbQuery(`INSERT INTO products (name, brand, category, description, images, stock, price) 
+            //     values (${dataInput.join(',')});`);
+
+            // res.status(200).send({
+            //     success: true,
+            //     message: 'Add product Success'
+            // })
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error)
+        }
     },
     update: async (req, res) => {
 
