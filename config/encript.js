@@ -14,7 +14,7 @@ module.exports = {
         console.log('data token',req.token);
         jwt.verify(req.token,'shopping',(err,decode)=>{
             if(err){
-                res.status(401).send({
+               return res.status(401).send({
                     message :'Authenticate error ❌'
                 })
             }

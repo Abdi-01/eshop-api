@@ -65,7 +65,7 @@ module.exports = {
         try {
             let resultsUser = await dbQuery(`Select u.iduser, u.username, u.email, u.age, u.city, u.role, u.status_id, s.status from users u 
             JOIN status s on u.status_id = s.idstatus 
-            WHERE u.iduser=${dbConf.escape(req.query.id)};`)
+            WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)};`)
 
             if (resultsUser.length > 0) {
                 let resultsCart = await dbQuery(`Select u.iduser, p.idproduct, p.name, p.images, p.brand, 
@@ -74,9 +74,11 @@ module.exports = {
                 JOIN products p ON p.idproduct = c.product_id 
                 WHERE c.user_id =${dbConf.escape(resultsUser[0].iduser)};`)
 
+                let token = createToken({...resultsUser[0]});
                 res.status(200).send({
                     ...resultsUser[0],
-                    cart: resultsCart
+                    cart: resultsCart,
+                    token
                 })
             }
 
