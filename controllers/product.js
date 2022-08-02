@@ -14,12 +14,19 @@ module.exports = {
     },
     deleteData: async (req, res) => {
         try {
-            await dbQuery(`DELETE from products where idproduct=${req.params.id}`);
-
-            res.status(200).send({
-                success: true,
-                message: 'Delete product'
-            })
+            if(req.dataToken.role=='Admin'){
+                await dbQuery(`DELETE from products where idproduct=${req.params.id}`);
+                
+                res.status(200).send({
+                    success: true,
+                    message: 'Delete product'
+                })
+            }else{
+                res.status(401).send({
+                    success: false,
+                    message: 'You are not admin ❌'
+                })
+            }
         } catch (error) {
             console.log(error);
             res.status(500).send(error);
