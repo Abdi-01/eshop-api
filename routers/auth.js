@@ -1,10 +1,11 @@
 const express = require('express');
+const { readToken } = require('../config/encript');
 const { authController } = require('../controllers');
 const route = express.Router();
 
 route.get('/all', authController.getData);
 route.post('/login', authController.login);
 route.post('/regis', authController.register);
-route.get('/keep', authController.keepLogin);
+route.get('/keep', readToken, authController.keepLogin);
 
 module.exports = route;
