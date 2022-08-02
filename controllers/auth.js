@@ -1,5 +1,5 @@
 const { dbConf, dbQuery } = require('../config/db');
-const { hashPassword } = require('../config/encript');
+const { hashPassword, createToken } = require('../config/encript');
 
 module.exports = {
     getData: (req, res) => {
@@ -50,10 +50,12 @@ module.exports = {
                     console.log('Error query SQL :', errCart);
                     res.status(500).send(errCart);
                 }
+                let token = createToken({ ...results[0] });
 
                 res.status(200).send({
                     ...results[0],
-                    cart: resultsCart
+                    cart: resultsCart,
+                    token
                 })
 
             })
@@ -65,7 +67,7 @@ module.exports = {
             JOIN status s on u.status_id = s.idstatus 
             WHERE u.iduser=${dbConf.escape(req.query.id)};`)
 
-            if(resultsUser.length > 0){
+            if (resultsUser.length > 0) {
                 let resultsCart = await dbQuery(`Select u.iduser, p.idproduct, p.name, p.images, p.brand, 
                 p.category, p.price, c.qty, p.price*c.qty as totalPrice from users u
                 JOIN carts c ON u.iduser=c.user_id
@@ -77,7 +79,7 @@ module.exports = {
                     cart: resultsCart
                 })
             }
-            
+
         } catch (error) {
             console.log('Error query SQL :', error);
             res.status(500).send(error);
