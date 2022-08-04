@@ -3,8 +3,26 @@ const fs = require('fs');
 module.exports = {
     getData: async (req, res) => {
         try {
-            let resultsGet = await dbQuery(`Select p.*, s.status from products p 
-            JOIN status s on p.status_id=s.idstatus;`)
+            console.log(req.query);
+
+            // console.log(`Select p.*, s.status from products p JOIN status s on p.status_id=s.idstatus;`)
+            // console.log(`Select p.*, s.status from products p JOIN status s on p.status_id=s.idstatus 
+            // where idproduct = ${dbConf.escape(req.query.idproduct)} AND status_id = ${dbConf.escape(req.query.status_id)};`)
+            let filter = [];
+            for (const key in req.query) {
+                if (key == 'lte') {
+                    filter.push(`price < ${dbConf.escape(req.query[key])}`)
+                } else if (key == 'gte') {
+                    filter.push(`price > ${dbConf.escape(req.query[key])}`)
+                } else {
+                    filter.push(`${key} = ${dbConf.escape(req.query[key])}`)
+                }
+            }
+            console.table(filter);
+            let sqlGet = `Select p.*, s.status from products p JOIN status s on p.status_id=s.idstatus 
+            ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} ;`;
+            
+            let resultsGet = await dbQuery(sqlGet);
 
             res.status(200).send(resultsGet)
         } catch (error) {
@@ -14,14 +32,14 @@ module.exports = {
     },
     deleteData: async (req, res) => {
         try {
-            if(req.dataToken.role=='Admin'){
+            if (req.dataToken.role == 'Admin') {
                 await dbQuery(`DELETE from products where idproduct=${req.params.id}`);
-                
+
                 res.status(200).send({
                     success: true,
                     message: 'Delete product'
                 })
-            }else{
+            } else {
                 res.status(401).send({
                     success: false,
                     message: 'You are not admin ❌'
@@ -62,6 +80,27 @@ module.exports = {
         }
     },
     update: async (req, res) => {
+        try {
+            if (req.dataToken.role == 'Admin') {
+                let newData = [];
+                Object.keys(req.body).forEach(val => {
+                    newData.push(`${val}=${dbConf.escape(req.body[val])}`);
+                })
+                await dbQuery(`UPDATE products set ${newData.join(', ')} where idproduct=${req.params.id}`);
 
+                res.status(200).send({
+                    success: true,
+                    message: 'UPDATE product'
+                })
+            } else {
+                res.status(401).send({
+                    success: false,
+                    message: 'You are not admin ❌'
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error);
+        }
     }
 }

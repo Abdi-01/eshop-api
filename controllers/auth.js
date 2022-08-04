@@ -1,5 +1,6 @@
 const { dbConf, dbQuery } = require('../config/db');
 const { hashPassword, createToken } = require('../config/encript');
+const { transport } = require('../config/nodemailer');
 
 module.exports = {
     getData: (req, res) => {
@@ -14,22 +15,40 @@ module.exports = {
                 res.status(200).send(results);
             })
     },
-    register: (req, res) => {
-        console.log(req.body);
-        let { username, email, password } = req.body;
-        dbConf.query(`INSERT INTO USERS (username, email, password ) 
-        values (${dbConf.escape(username)}, ${dbConf.escape(email)},  
-        ${dbConf.escape(hashPassword(password))});`, (err, results) => {
-            if (err) {
-                console.log('Error query SQL :', err);
-                res.status(500).send(err);
+    register: async (req, res) => {
+        try {
+            let { username, email, password } = req.body;
+            let sqlInsert = await dbQuery(`INSERT INTO USERS (username, email, password ) 
+            values (${dbConf.escape(username)}, ${dbConf.escape(email)},  
+            ${dbConf.escape(hashPassword(password))});`);
+
+            console.log(sqlInsert);
+            if (sqlInsert.insertId) {
+                let sqlGet = await dbQuery(`Select iduser, email, status_id from users where iduser=${sqlInsert.insertId}`);
+
+                // Generate token
+                let token = createToken({ ...sqlGet[0] }, '1h');
+
+                // Mengirimkan email
+                await transport.sendMail({
+                    from: 'ESHOP ADMIN CARE',
+                    to: sqlGet[0].email,
+                    subject: 'Verification email account',
+                    html: `<div>
+                    <h3>Click link below</h3>
+                    <a href="http://localhost:3000/verification/${token}">Verified Account</a>
+                    </div>`
+                })
+                res.status(200).send({
+                    success: true,
+                    message: 'Register Success'
+                })
             }
 
-            res.status(200).send({
-                success: true,
-                message: 'Register Success'
-            })
-        })
+        } catch (error) {
+            console.log('Error query SQL :', error);
+            res.status(500).send(error);
+        }
     },
     login: (req, res) => {
         let { email, password } = req.body;
@@ -74,7 +93,7 @@ module.exports = {
                 JOIN products p ON p.idproduct = c.product_id 
                 WHERE c.user_id =${dbConf.escape(resultsUser[0].iduser)};`)
 
-                let token = createToken({...resultsUser[0]});
+                let token = createToken({ ...resultsUser[0] });
                 res.status(200).send({
                     ...resultsUser[0],
                     cart: resultsCart,

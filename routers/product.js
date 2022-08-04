@@ -10,6 +10,6 @@ const uploadFile = uploader('/imgProduct', 'IMGPRD').array('images', 1);
 route.get('/', productController.getData)
 route.post('/', uploadFile, readToken, productController.add);
 route.delete('/:id', readToken, productController.deleteData);
-route.patch('/:id', productController.update);
+route.patch('/:id', readToken, productController.update);
 
 module.exports = route
