@@ -105,5 +105,46 @@ module.exports = {
             console.log('Error query SQL :', error);
             res.status(500).send(error);
         }
+    },
+    verification: async (req, res) => {
+        try {
+            console.log(req.dataToken)
+            if (req.dataToken.iduser) {
+                //    1. update status user, yang awalnya unverified menjadi Verify
+                await dbQuery(`UPDATE users set status_id=1 WHERE iduser=${dbConf.escape(req.dataToken.iduser)};`);
+                // 2. proses login 
+                let resultsUser = await dbQuery(`Select u.iduser, u.username, u.email, u.age, u.city, u.role, u.status_id, s.status from users u 
+                JOIN status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)};`);
+                if (resultsUser.length > 0) {
+                    // 3. login berhasil, maka kita buat token baru
+                    let token = createToken({ ...resultsUser[0] });
+                    res.status(200).send(
+                        {
+                            success: true,
+                            messages: "Verify Success ✅",
+                            dataLogin: {
+                                ...resultsUser[0],
+                                token
+                            },
+                            error: ""
+                        }
+                    )
+                }
+            } else {
+                res.status(401).send({
+                    success: false,
+                    messages: "Verify Failed ❌",
+                    dataLogin: {},
+                    error: ""
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).send({
+                success: false,
+                message: "Failed ❌",
+                error
+            });
+        }
     }
 }
