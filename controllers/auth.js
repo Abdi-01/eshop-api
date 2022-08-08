@@ -36,7 +36,7 @@ module.exports = {
                     subject: 'Verification email account',
                     html: `<div>
                     <h3>Click link below</h3>
-                    <a href="http://localhost:3000/verification/${token}">Verified Account</a>
+                    <a href="${process.env.FE_URL}/verification/${token}">Verified Account</a>
                     </div>`
                 })
                 res.status(200).send({
