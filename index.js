@@ -5,6 +5,21 @@ const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT;
 const bearerToken = require('express-bearer-token');
+const session = require('express-session');
+const passport = require('passport');
+
+app.use(session({
+    resave:false,
+    saveUninitialized:true,
+    secret:'SECRET'
+}));
+
+// Config passport
+require('./config/passport');
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.use(express.static('public'));
 app.use(express.json());
