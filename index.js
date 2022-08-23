@@ -27,7 +27,7 @@ app.use(cors());
 app.use(bearerToken());
 
 app.get('/', (req, res) => {
-    res.status(200).send('<h1>ESHOP API</h1>');
+    res.status(200).send('<h1>ESHOP API UPDATE</h1>');
 })
 
 // DB Check Connection
