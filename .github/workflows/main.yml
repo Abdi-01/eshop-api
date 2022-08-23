@@ -45,4 +45,4 @@ jobs:
           script: |
             cd /root/eshop-api
             npm install
-            pm2 start index.js --name eshop-api-ci 
+            pm2 restart eshop-api-ci 
