@@ -31,14 +31,14 @@ app.get('/', (req, res) => {
 })
 
 // DB Check Connection
-// const { dbConf } = require('./config/db');
-// dbConf.getConnection((error,connection)=>{
-//     if(error){
-//         console.log("Error MySQL Connection", error.sqlMessage);
-//     }
+const { dbConf } = require('./config/db');
+dbConf.getConnection((error,connection)=>{
+    if(error){
+        console.log("Error MySQL Connection", error.sqlMessage);
+    }
 
-//     console.log(`Connect MySQL ✅ : ${connection.threadId}`);
-// })
+    console.log(`Connect MySQL ✅ : ${connection.threadId}`);
+})
 // CONFIG ROUTERS
 const { authRouter, productRouter } = require('./routers');
 app.use('/auth', authRouter);
